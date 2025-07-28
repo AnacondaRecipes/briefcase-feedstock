@@ -21,15 +21,11 @@ requirements:
     - python
     - setuptools
     - setuptools-scm
-    - pip
+    - wheel
   run:
     - python
     - importlib-metadata >=4.4  # [py<=39]
     - packaging >=24.2
-    - pip >=24.3
-    - setuptools >=60
-    - wheel >=0.37
-    - build >=0.10
     - truststore >=0.10.1  # [py>=310]
     - cookiecutter >=2.6.0,<3.0
     - dmgbuild >=1.6.4,<2.0  # [osx]
