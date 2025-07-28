@@ -1,45 +1,67 @@
-{% set name = "<PLEASE ADD PKG NAME>" %}
-{% set version = "<PLEASE ADD PKG VERSION>" %}
+{% set name = "briefcase" %}
+{% set version = "0.3.24" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: <sha256>
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/briefcase-{{ version }}.tar.gz
+  sha256: 84d7cebbbad92d6899f8d9793004ac11ea5e60879b9f447d61dfa84751d1ffd2
 
 build:
-  number: 0
+  skip: true  # [py<39 or not win]
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
-  skip: True  # [py<38]
+  number: 0
+  entry_points:
+    - briefcase = briefcase.__main__:main
 
 requirements:
   host:
     - python
+    - setuptools
+    - setuptools-scm
     - pip
   run:
     - python
+    - importlib-metadata >=4.4  # [py<=39]
+    - packaging >=24.2
+    - pip >=24.3
+    - setuptools >=60
+    - wheel >=0.37
+    - build >=0.10
+    - truststore >=0.10.1  # [py>=310]
+    - cookiecutter >=2.6.0,<3.0
+    - dmgbuild >=1.6.4,<2.0  # [osx]
+    - gitpython >=3.1,<4.0
+    - platformdirs >=2.6,<5.0
+    - psutil >=5.9,<8.0
+    - python-dateutil >=2.9.0.post0
+    - httpx >=0.20,<1.0
+    - rich >=12.6,<15.0
+    - tomli >=2.0,<3.0  # [py<=310]
+    - tomli-w >=1.0,<2.0
 
 test:
   imports:
-    - {{ name.replace('-', '.') }}
-  requires:
-    - pip
+    - briefcase
   commands:
     - pip check
+    - briefcase --help
+  requires:
+    - pip
 
 about:
-  home: <PLEASE ADD HOME URL>
-  summary: <PLEASE ADD SUMMARY>
+  home: https://briefcase.readthedocs.io/
+  summary: Tools to support converting a Python project into a standalone native application.
+  dev_url: https://github.com/beeware/briefcase
+  license: BSD-3-Clause
+  license_file: LICENSE
+  license_family: BSD
+  doc_url: https://briefcase.readthedocs.io/
   description: |
-    <PLEASE ADD DESCRIPTION>
-  license: <PLEASE ADD LICENSE>
-  license_family: <PLEASE ADD LICENSE_FAMILY>
-  license_file: <PLEASE_ADD_LICENSE_FILE>
-  dev_url: <PLEASE ADD DEV URL>
-  doc_url: <PLEASE ADD DOC URL>
-
+    Tools to support converting a Python project into a standalone native application.
 extra:
   recipe-maintainers:
     - Jrice1317
+    - Arishamays1
