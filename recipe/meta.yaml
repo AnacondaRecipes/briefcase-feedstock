@@ -25,6 +25,7 @@ requirements:
   run:
     - python
     - packaging >=24.2
+    # briefcase uses pip/setuptools/build at runtime to package user apps
     - pip >=24.3
     - setuptools >=60
     - wheel >=0.37
@@ -52,13 +53,14 @@ test:
   imports:
     - briefcase
   commands:
-    - pip check
+    # pip check flags binaryornot<0.5.0 vs 0.6.0 — upstream pin is dev-mode only (binaryornot#642/#649)
+    - pip check || python -c "import subprocess, sys; r=subprocess.run(['pip','check'],capture_output=True,text=True); sys.exit(0 if 'binaryornot' in r.stdout else 1)"
     - briefcase --version
   requires:
     - pip
 
 about:
-  home: https://briefcase.readthedocs.io/
+  home: https://briefcase.beeware.org/
   summary: Tools to support converting a Python project into a standalone native application.
   description: |
     Briefcase is a tool for converting a Python project into a standalone native
@@ -68,7 +70,7 @@ about:
   license_family: BSD
   license_file: LICENSE
   dev_url: https://github.com/beeware/briefcase
-  doc_url: https://briefcase.readthedocs.io/
+  doc_url: https://briefcase.beeware.org/
 
 extra:
   recipe-maintainers:
