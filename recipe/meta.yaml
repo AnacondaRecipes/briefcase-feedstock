@@ -35,9 +35,7 @@ requirements:
     # Upstream pins chardet <6.0 due to requests 2.32.5 runtime warning (psf/requests#7219)
     - chardet <6.0
     # Upstream pins binaryornot <0.5.0 due to bugs in 0.5.0/0.6.0 under dev mode.
-    # pkgs/main only has 0.6.0; the issue only manifests in dev mode (warnings as errors),
-    # safe to relax for conda packaging.
-    - binaryornot
+    - binaryornot <0.5.0
     - dmgbuild >=1.6.4,<2.0 # [osx]
     - gitpython >=3.1,<4.0
     - platformdirs >=2.6,<5.0
@@ -53,8 +51,7 @@ test:
   imports:
     - briefcase
   commands:
-    # pip check flags binaryornot<0.5.0 vs 0.6.0 — upstream pin is dev-mode only (binaryornot#642/#649)
-    - pip check || python -c "import subprocess, sys; r=subprocess.run(['pip','check'],capture_output=True,text=True); sys.exit(0 if 'binaryornot' in r.stdout else 1)"
+    - pip check 
     - briefcase --version
   requires:
     - pip
@@ -73,5 +70,7 @@ about:
   doc_url: https://briefcase.beeware.org/
 
 extra:
+  skip-lints:
+    - python_build_tools_in_host
   recipe-maintainers:
     - cbouss
