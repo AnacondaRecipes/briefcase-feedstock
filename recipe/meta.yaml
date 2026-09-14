@@ -1,5 +1,5 @@
 {% set name = "briefcase" %}
-{% set version = "0.4.3" %}
+{% set version = "0.4.5" %}
 
 package:
   name: {{ name|lower }}
@@ -7,11 +7,11 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 9814899daab8c5f1faeb96896986986948668d6effc32fe25ed850e2cc81b29d
+  sha256: b3c9e2f781ad6ca9e241a73ca80660624fed86db5b3e65a80b7a5bb697d54741
 
 build:
   number: 0
-  skip: true  # [py<310]
+  skip: true  # [py<311]
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   entry_points:
     - briefcase = briefcase.__main__:main
@@ -32,10 +32,8 @@ requirements:
     - python-build >=0.10
     - truststore >=0.10.1
     - cookiecutter >=2.6.0,<3.0
-    # Upstream pins chardet <6.0 due to requests 2.32.5 runtime warning (psf/requests#7219)
-    - chardet <6.0
-    # Upstream pins binaryornot <0.5.0 due to bugs in 0.5.0/0.6.0 under dev mode.
-    - binaryornot <0.5.0
+    # Upstream pins chardet <8.0 due to requests runtime warning (psf/requests#7219)
+    - chardet <8.0
     - dmgbuild >=1.6.4,<2.0 # [osx]
     - gitpython >=3.1,<4.0
     - platformdirs >=2.6,<5.0
@@ -44,7 +42,6 @@ requirements:
     - httpx >=0.20,<1.0
     - rich >=12.6,<16.0
     - tenacity >=8.0,<10.0
-    - tomli >=2.0,<3.0  # [py<=310]
     - tomli-w >=1.0,<2.0
 
 test:
