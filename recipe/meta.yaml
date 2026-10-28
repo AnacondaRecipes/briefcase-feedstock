@@ -43,6 +43,14 @@ requirements:
     - tenacity >=9.2.0,<10.0
     - tomli-w >=1.0,<2.0
 
+# briefcase deliberately refuses to auto-install the Android SDK on Linux/aarch64,
+# Google ships no arm64 linux cmdline-tools
+{% set disabled_tests = "" %}
+{% set disabled_tests = disabled_tests + " download_sdk" %}  # [aarch64]
+{% set disabled_tests = disabled_tests + " or upgrade_existing_sdk" %}  # [aarch64]
+{% set disabled_tests = disabled_tests + " or networkfailure_on_connectionerror" %}  # [aarch64]
+{% set disabled_tests = disabled_tests + " or detects_bad_zipfile" %}  # [aarch64]
+ 
 test:
   source_files:
     - tests
