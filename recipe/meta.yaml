@@ -43,6 +43,33 @@ requirements:
     - tenacity >=9.2.0,<10.0
     - tomli-w >=1.0,<2.0
 
+# Windows/ARM64: briefcase cannot auto-install the Android SDK (Google ships no arm64
+# cmdline-tools) and builds WiX MSIs with `-arch arm64` / Visual Studio output under ARM64/
+# instead of x64/, so the upstream tests hard-coding the x86_64 equivalents cannot pass.
+{% set deselect_tests = "" %}
+{% set deselect_tests = deselect_tests + ' --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_download_sdk' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_download_sdk_legacy_install' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_download_sdk_if_sdkmanager_not_executable' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_upgrade_existing_sdk' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_raises_networkfailure_on_connectionerror' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_detects_bad_zipfile' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/integrations/android_sdk/AndroidSDK/test_select_target_device.py::test_auto_non_existent' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect "tests/platforms/windows/app/test_package.py::test_package_msi[kwargs0-False]"' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect "tests/platforms/windows/app/test_package.py::test_package_msi[kwargs1-True]"' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect "tests/platforms/windows/app/test_package.py::test_package_msi[kwargs2-False]"' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect "tests/platforms/windows/app/test_package.py::test_package_msi_with_codesigning[False-additional_args0]"' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect "tests/platforms/windows/app/test_package.py::test_package_msi_with_codesigning[True-additional_args1]"' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/app/test_package.py::test_package_msi_failed_compile' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/app/test_package.py::test_package_msi_failed_signing_msi' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/visualstudio/test_create.py::test_package_path' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/visualstudio/test_mixin.py::test_binary_path' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/visualstudio/test_package.py::test_package_msi' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app_with_args' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app_test_mode' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app_test_mode_with_args' %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + ' --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app_debugger' %}  # [win and arm64]
+
 test:
   source_files:
     - tests
@@ -56,13 +83,10 @@ test:
   commands:
     - pip check
     - briefcase --version
-    # briefcase deliberately refuses to auto-install the Android SDK on Linux/aarch64 and
-    # Windows/ARM64 (Google ships no arm64 cmdline-tools), so its download-path tests cannot pass there
+    # briefcase deliberately refuses to auto-install the Android SDK on Linux/aarch64
+    # (Google ships no arm64 linux cmdline-tools), so its download-path tests cannot pass there
     - pytest -vv tests -k "not (download_sdk or upgrade_existing_sdk or networkfailure_on_connectionerror or detects_bad_zipfile)"  # [linux and aarch64]
-    # Windows/ARM64 additionally produces WiX MSIs with `-arch arm64` and Visual Studio output under
-    # ARM64/ instead of x64/, while the upstream tests hard-code the x86_64 equivalents
-    - pytest -vv tests --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_download_sdk --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_download_sdk_legacy_install --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_download_sdk_if_sdkmanager_not_executable --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_upgrade_existing_sdk --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_raises_networkfailure_on_connectionerror --deselect tests/integrations/android_sdk/AndroidSDK/test_verify.py::test_detects_bad_zipfile --deselect tests/integrations/android_sdk/AndroidSDK/test_select_target_device.py::test_auto_non_existent --deselect "tests/platforms/windows/app/test_package.py::test_package_msi[kwargs0-False]" --deselect "tests/platforms/windows/app/test_package.py::test_package_msi[kwargs1-True]" --deselect "tests/platforms/windows/app/test_package.py::test_package_msi[kwargs2-False]" --deselect "tests/platforms/windows/app/test_package.py::test_package_msi_with_codesigning[False-additional_args0]" --deselect "tests/platforms/windows/app/test_package.py::test_package_msi_with_codesigning[True-additional_args1]" --deselect tests/platforms/windows/app/test_package.py::test_package_msi_failed_compile --deselect tests/platforms/windows/app/test_package.py::test_package_msi_failed_signing_msi --deselect tests/platforms/windows/visualstudio/test_create.py::test_package_path --deselect tests/platforms/windows/visualstudio/test_mixin.py::test_binary_path --deselect tests/platforms/windows/visualstudio/test_package.py::test_package_msi --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app_with_args --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app_test_mode --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app_test_mode_with_args --deselect tests/platforms/windows/visualstudio/test_run.py::test_run_app_debugger  # [win and arm64]
-    - pytest -vv tests  # [not (linux and aarch64) and not (win and arm64)]
+    - pytest -vv tests{{ deselect_tests }}  # [not (linux and aarch64)]
   requires:
     - pip
     - pytest
